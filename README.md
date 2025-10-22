@@ -59,21 +59,28 @@ This application follows **Clean Architecture** principles with **MVVM (Model-Vi
 │           Presentation Layer        │
 │  ┌─────────────┐  ┌─────────────┐   │
 │  │   Compose   │  │  ViewModel  │   │
-│  │     UI      │  │             │   │
+│  │     UI      │  │   + State   │   │
 │  └─────────────┘  └─────────────┘   │
 └─────────────────────────────────────┘
 ┌─────────────────────────────────────┐
 │            Domain Layer             │
 │  ┌─────────────┐  ┌─────────────┐   │
-│  │ Use Cases   │  │ Repository  │   │
-│  │             │  │ Interface   │   │
+│  │ Repository  │  │ Exceptions  │   │
+│  │ Interface   │  │ & Models    │   │
 │  └─────────────┘  └─────────────┘   │
 └─────────────────────────────────────┘
 ┌─────────────────────────────────────┐
 │             Data Layer              │
 │  ┌─────────────┐  ┌─────────────┐   │
-│  │ Repository  │  │ API Service │   │
-│  │    Impl     │  │             │   │
+│  │ Repository  │  │ API Services│   │
+│  │Implementation│  │ & Models    │   │
+│  └─────────────┘  └─────────────┘   │
+└─────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│        Dependency Injection        │
+│  ┌─────────────┐  ┌─────────────┐   │
+│  │ AppContainer│  │ Application │   │
+│  │             │  │   Context   │   │
 │  └─────────────┘  └─────────────┘   │
 └─────────────────────────────────────┘
 ```
@@ -81,9 +88,10 @@ This application follows **Clean Architecture** principles with **MVVM (Model-Vi
 ### Key Architectural Decisions
 
 #### 1. **MVVM with Clean Architecture**
-- **Presentation Layer**: Jetpack Compose UI + ViewModels
-- **Domain Layer**: Use cases and repository interfaces
-- **Data Layer**: Repository implementations and API services
+- **Presentation Layer**: Jetpack Compose UI + ViewModels + UI State Management
+- **Domain Layer**: Repository interfaces, domain models, and custom exceptions
+- **Data Layer**: Repository implementations, API services (Weather & Geocoding), and data models
+- **Dependency Injection**: AppContainer for managing dependencies
 - **Benefits**: Clear separation of concerns, improved testability, maintainability
 
 #### 2. **Jetpack Compose for UI**
@@ -96,10 +104,11 @@ This application follows **Clean Architecture** principles with **MVVM (Model-Vi
 - **Implementation**: Interface in domain layer, implementation in data layer
 - **Benefits**: Easy to mock for testing, flexible data source switching
 
-#### 4. **Dependency Injection Ready**
-- **Structure**: Constructor injection pattern
-- **Benefits**: Improved testability, loose coupling
-- **Future**: Ready for Hilt/Dagger integration
+#### 4. **Dependency Injection Pattern**
+- **Structure**: Manual dependency injection with AppContainer
+- **Implementation**: Constructor injection pattern throughout the app
+- **Benefits**: Improved testability, loose coupling, centralized dependency management
+- **Future**: Ready for Hilt/Dagger integration when needed
 
 #### 5. **Error Handling Strategy**
 - **Approach**: Custom exception types with user-friendly messages
@@ -113,30 +122,47 @@ app/src/main/java/com/weatherapp/
 ├── data/                             # Data Layer
 │   ├── api/
 │   │   ├── ApiClient.kt              # HTTP client configuration
-│   │   └── WeatherApiService.kt      # API service definitions
+│   │   ├── WeatherApiService.kt      # Weather API service definitions
+│   │   └── GeocodeApiService.kt      # Geocoding API service definitions
+│   ├── local/
+│   │   └── CityDataSource.kt         # Local city data and suggestions
 │   ├── model/
 │   │   ├── WeatherData.kt            # Domain models
-│   │   └── WeatherResponse.kt        # API response models
-│   └── repository/
-│       └── WeatherRepositoryImpl.kt  # Repository implementation
+│   │   ├── WeatherResponse.kt        # Weather API response models
+│   │   └── GeocodeResponse.kt        # Geocoding API response models
+│   ├── repository/
+│   │   └── WeatherRepositoryImpl.kt  # Repository implementation
+│   └── service/
+│       └── GeocodeService.kt         # Geocoding service logic
+├── di/                               # Dependency Injection
+│   └── AppContainer.kt               # Manual DI container
 ├── domain/                           # Domain Layer
 │   ├── exception/
 │   │   └── WeatherException.kt       # Custom exceptions
 │   ├── model/
-│   │   └── Weather.kt                # Domain entities
-│   ├── repository/
-│   │   └── WeatherRepository.kt      # Repository interface
-│   └── usecase/
-│       └── GetWeatherUseCase.kt      # Business logic
+│   │   └── Result.kt                 # Result wrapper for success/error states
+│   └── repository/
+│       └── WeatherRepository.kt      # Repository interface
 ├── presentation/                     # Presentation Layer
-│   ├── ui/
-│   │   ├── components/               # Reusable UI components
-│   │   ├── screen/                   # Screen composables
-│   │   └── theme/                    # App theming
+│   ├── components/
+│   │   ├── WeatherCard.kt            # Weather display components
+│   │   └── WeatherIcon.kt            # Weather icon component
+│   ├── screen/
+│   │   └── WeatherScreen.kt          # Main weather screen composable
 │   └── viewmodel/
 │       ├── WeatherViewModel.kt       # UI state management
 │       └── WeatherUiState.kt         # UI state definitions
-└── MainActivity.kt                   # Single activity entry point
+├── ui/                               # UI Components & Theme
+│   ├── components/
+│   │   └── AutocompleteTextField.kt  # Reusable autocomplete input
+│   ├── constants/
+│   │   └── AppStrings.kt             # String constants
+│   └── theme/                        # App theming
+│       ├── Color.kt                  # Color definitions
+│       ├── Theme.kt                  # Theme configuration
+│       └── Type.kt                   # Typography definitions
+├── MainActivity.kt                   # Single activity entry point
+└── WeatherApplication.kt             # Application class with DI setup
 ```
 
 ### Technology Stack
@@ -156,7 +182,7 @@ app/src/main/java/com/weatherapp/
 #### Testing
 - **JUnit**: Unit testing framework
 - **Espresso**: UI testing framework
-- **Mockito**: Mocking framework (ready for implementation)
+- **MockK**: Mocking framework for Kotlin
 
 #### Build & Development
 - **Gradle Kotlin DSL**: Build configuration
@@ -213,7 +239,7 @@ The app is smart about it too - it caches responses so you're not constantly hit
 
 ## 🧪 Testing
 
-We believe in building reliable software, so this app comes with a solid testing foundation:
+The application includes comprehensive unit and UI tests to ensure reliability and maintainability.
 
 ### What's Tested
 - **Unit Tests**: Making sure all the individual pieces work correctly
@@ -232,7 +258,7 @@ The tests cover things like:
 - Data transformation (making sure temperatures convert correctly)
 
 ### Test Coverage
-We aim for comprehensive coverage of business logic and data handling. The tests help ensure that when you search for "London," you get London's weather, not London, Ontario by mistake!
+Comprehensive test coverage ensures reliable business logic and data handling functionality.
 
 **UI Tests**
 ```bash
@@ -254,145 +280,69 @@ app/src/androidTest/                   # UI tests
 
 ## 🛡️ Error Handling & Security
 
-Nobody likes apps that crash, so we've built this one to handle problems gracefully:
+The application implements comprehensive error handling to provide a smooth user experience even when things go wrong.
 
-### When Things Go Wrong
-The app is prepared for real-world scenarios:
-- **No internet?** You'll get a friendly message instead of a crash
-- **City not found?** The app will let you know and suggest trying a different spelling
-- **API having issues?** We'll show you what's happening and suggest trying again later
-- **Slow connection?** Loading indicators keep you informed while we fetch your data
+### Error Scenarios Handled
+- **Network failures**: Graceful handling of connectivity issues
+- **Invalid API responses**: Robust parsing and validation
+- **City not found**: Clear user feedback for invalid locations
+- **API rate limits**: Appropriate retry mechanisms
+- **Malformed data**: Safe fallbacks and error states
 
-### Keeping Your Data Safe
-- **API keys are secure**: Your OpenWeatherMap key stays in local configuration files, never in the code
-- **No personal data stored**: We don't collect or store any of your personal information
-- **Network security**: All API calls use HTTPS encryption
-- **Input validation**: The app checks what you type to prevent any funny business
+### Security Measures
+- **API key protection**: Secure storage and transmission
+- **Input validation**: Sanitization of user inputs
+- **Network security**: HTTPS-only communication
+- **Data privacy**: No personal data collection or storage
 
-### Error Types You Might See
-- **Network errors**: When your internet is playing hide and seek
-- **API errors**: When the weather service needs a coffee break
-- **Validation errors**: When a city name doesn't quite match what we're expecting
-
-The app handles all of these gracefully, so you always know what's happening and what to do next.
+### Error Types
+- **NetworkException**: Connection or timeout issues
+- **ApiException**: Invalid API responses or server errors
+- **ValidationException**: Invalid input data or parameters
 
 ## ⚡ Performance Optimizations
 
-We've fine-tuned this app to be fast and efficient, because nobody has time to wait for weather updates:
+The application is optimized for performance and efficiency:
 
-### Smart API Usage
-- **Direct metric units**: We request temperatures in Celsius directly from the API instead of converting from Kelvin (one less calculation!)
-- **Efficient caching**: The app remembers recent weather data so it doesn't need to ask the internet every time
-- **Debounced search**: When you're typing a city name, we wait until you pause before searching (saves unnecessary API calls)
+### API Optimization
+- **Efficient requests**: Minimal API calls with comprehensive data retrieval
+- **Request debouncing**: Prevents excessive API calls during user input
+- **Error retry logic**: Smart retry mechanisms for failed requests
 
-### Network Optimizations
-- **10MB response cache**: Recent weather data is stored locally for faster access
-- **Optimized timeouts**: Connection settings are tuned for the best balance of speed and reliability
-- **Smart logging**: Debug information is only collected during development, keeping the production app lean
+### Network Optimization
+- **Connection pooling**: Efficient HTTP client configuration
+- **Timeout management**: Appropriate timeouts for different operations
+- **Background processing**: Non-blocking network operations
 
 ### Code Efficiency
-- **Clean architecture**: Well-organized code means faster compilation and easier maintenance
-- **Removed duplicate code**: Less code means faster execution and smaller app size
-- **Optimized UI updates**: The interface only refreshes when it actually needs to
+- **Jetpack Compose**: Modern UI toolkit for optimal rendering performance
+- **State management**: Efficient UI state handling with minimal recomposition
+- **Memory optimization**: Proper resource management and lifecycle awareness
 
-### What This Means for You
-- **Faster searches**: City suggestions appear quickly as you type
-- **Less data usage**: Cached responses mean fewer internet requests
-- **Smoother experience**: The app feels responsive even on slower connections
-- **Longer battery life**: Efficient code means your phone works less hard
+### Performance Benefits
+- **Fast startup**: Quick application initialization and loading
+- **Smooth animations**: Responsive UI with minimal lag
+- **Low memory usage**: Efficient resource utilization
+- **Battery optimization**: Minimal background processing
 
 ## 🚀 Future Enhancements
 
-Got ideas? So do we! Here are some cool features we're thinking about adding:
-
-### Weather Features
-- **7-day forecast**: Because sometimes you need to plan that weekend trip
-- **Hourly predictions**: Perfect for "should I bring an umbrella to lunch?" decisions
-- **Weather alerts**: Get notified about severe weather in your area
-- **Multiple locations**: Save your favorite cities for quick access
-- **Weather maps**: Visual radar and satellite imagery
-
-### User Experience
-- **Dark mode**: For those late-night weather checks
-- **Custom themes**: Make the app match your style
-- **Widget support**: Weather info right on your home screen
-- **Voice search**: "Hey app, what's the weather in Tokyo?"
-- **Offline mode**: Basic functionality even without internet
-
-### Smart Features
-- **Location-based weather**: Automatic weather for wherever you are
-- **Smart notifications**: "It's going to rain in 30 minutes!"
-- **Weather-based suggestions**: "Perfect day for a picnic!" or "Maybe stay inside today"
-- **Historical data**: "This time last year it was..."
+### Planned Features
+- **Extended Forecasts**: 7-day and hourly weather predictions
+- **Multiple Locations**: Save and manage favorite cities
+- **Weather Alerts**: Severe weather notifications
+- **Location Services**: GPS-based automatic weather detection
+- **Offline Support**: Basic functionality without internet connection
 
 ### Technical Improvements
-- **Wear OS support**: Weather on your smartwatch
-- **Better accessibility**: Making sure everyone can use the app
-- **Performance monitoring**: Keep making it faster and smoother
-
-Have a feature request? We'd love to hear it!
-
-## 🤝 Contributing
-
-Want to help make this weather app even better? We'd love to have you on board! Here's how you can contribute:
-
-### Ways to Help
-- **Found a bug?** Open an issue and tell us what went wrong
-- **Have an idea?** Suggest new features or improvements
-- **Code contributions**: Fix bugs, add features, or improve performance
-- **Documentation**: Help make our docs even clearer
-- **Testing**: Try the app on different devices and report what you find
-
-### Getting Started with Contributing
-1. **Fork the repository** - Make your own copy to work with
-2. **Create a feature branch** - Keep your changes organized
-3. **Make your changes** - Fix that bug or add that feature
-4. **Test everything** - Make sure your changes work and don't break anything else
-5. **Submit a pull request** - Share your improvements with us!
-
-### Code Style
-We try to keep things consistent:
-- Follow the existing Kotlin coding conventions
-- Add comments for complex logic
-- Write tests for new features
-- Keep commits focused and descriptive
-
-### What We're Looking For
-- Bug fixes (always appreciated!)
-- Performance improvements
-- New weather features
-- UI/UX enhancements
-- Better error handling
-- More comprehensive tests
-
-Every contribution, big or small, helps make this app better for everyone!
+- **Hilt/Dagger Integration**: Replace manual DI with automated framework
+- **Room Database**: Local data persistence and caching
+- **Wear OS Support**: Companion app for smartwatches
+- **Widget Support**: Home screen weather widgets
+- **Accessibility Enhancements**: Improved screen reader support
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 **What does this mean?** You're free to use, modify, and distribute this code however you'd like! Just keep the original license notice if you share it.
-
-## 🙏 Acknowledgments
-
-Big thanks to the amazing tools and services that make this app possible:
-
-- **[OpenWeatherMap](https://openweathermap.org/)** - For providing reliable weather data and a developer-friendly API
-- **[Jetpack Compose](https://developer.android.com/jetpack/compose)** - Making Android UI development actually enjoyable
-- **[Retrofit](https://square.github.io/retrofit/)** - For making API calls simple and elegant
-- **[OkHttp](https://square.github.io/okhttp/)** - The networking powerhouse behind the scenes
-- **[Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)** - For keeping everything smooth and responsive
-
-## 💬 Support
-
-Got questions? Running into issues? Here's how to get help:
-
-- **Check the issues**: Someone might have already asked the same question
-- **Open a new issue**: If you can't find an answer, create a new issue with details about your problem
-- **Discussions**: For general questions or feature ideas, start a discussion
-
-We're here to help and always happy to chat about weather apps, Android development, or anything related to this project!
-
----
-
-*Made with ☀️ and a little bit of ⛈️ by developers who care about good weather apps*
