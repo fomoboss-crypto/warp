@@ -1,163 +1,193 @@
 # 🌦️ WeatherApp
 
-Hey there! Welcome to WeatherApp - your friendly neighborhood weather companion! 👋
+A modern Android weather application built with Kotlin and Jetpack Compose, following MVVM architecture and Clean Architecture principles.
 
-Ever wondered what the weather's like in Tokyo while you're sipping coffee in New York? Or maybe you just want to know if you need an umbrella today? This little app has got you covered! Built with love using Kotlin and Jetpack Compose, it's designed to give you all the weather info you need in a beautiful, easy-to-use interface.
+## 📋 Requirements
 
-## ✨ What Can This App Do?
+- **Minimum Android SDK**: API level 24 (Android 7.0)
+- **Target SDK**: API level 34 (Android 14)
+- **Compile SDK**: API level 34
+- **Java**: Version 11 or higher
+- **Android Studio**: Arctic Fox or newer
 
-Let me tell you about all the cool stuff packed into this weather app:
+## 🚀 Build and Run Instructions
 
-- 🌤️ **Real-time Weather**: Get the current temperature, weather conditions, humidity, and wind speed for any city
-- 🔍 **Smart City Search**: Just start typing a city name and watch the magic happen with autocomplete suggestions
-- ⚡ **Lightning Fast**: Smooth loading animations so you're never left wondering what's happening
-- 🚨 **Friendly Error Messages**: When things go wrong (hey, it happens!), you'll get helpful messages instead of cryptic tech-speak
-- 🎨 **Beautiful Design**: Clean, modern interface that looks great and follows Material Design 3 principles
-- 🌙 **Dark Mode Ready**: Automatically switches between light and dark themes based on your system preferences
-- 📱 **Works Everywhere**: Looks amazing on phones, tablets, and everything in between
+### Prerequisites
+1. Install Android Studio with Android SDK
+2. Ensure Java 11+ is installed
+3. Get a free API key from [OpenWeatherMap](https://openweathermap.org/api)
 
-## 🏗️ How It's Built (For the Curious Minds)
-
-Don't worry, I won't bore you with too much technical jargon, but if you're interested in how this app works under the hood, here's the scoop!
-
-This app follows the **MVVM (Model-View-ViewModel)** pattern - think of it as a well-organized kitchen where everything has its place and purpose. Here's how the pieces fit together:
-
-### The App's Blueprint
-
-```
-┌─────────────────────────────────────┐
-│        What You See & Touch         │
-│  ┌─────────────┐  ┌─────────────┐   │
-│  │   Screen    │  │  ViewModel  │   │
-│  │ (The UI)    │  │ (The Brain) │   │
-│  └─────────────┘  └─────────────┘   │
-└─────────────────────────────────────┘
-┌─────────────────────────────────────┐
-│         Business Logic              │
-│  ┌─────────────┐  ┌─────────────┐   │
-│  │ Repository  │  │  Use Cases  │   │
-│  │ Interface   │  │ (The Rules) │   │
-│  └─────────────┘  └─────────────┘   │
-└─────────────────────────────────────┘
-┌─────────────────────────────────────┐
-│         Data Management             │
-│  ┌─────────────┐  ┌─────────────┐   │
-│  │ Repository  │  │ API Service │   │
-│  │    Impl     │  │ (Internet)  │   │
-│  └─────────────┘  └─────────────┘   │
-└─────────────────────────────────────┘
-```
-
-### Why This Matters to You
-
-1. **Clean & Organized**: Everything has its place, making the app reliable and easy to maintain
-2. **Easy to Test**: We can make sure everything works perfectly before you use it
-3. **Fast & Responsive**: Smart data management means quick responses and smooth interactions
-4. **Error-Proof**: If something goes wrong, the app handles it gracefully
-5. **Future-Ready**: Easy to add new features without breaking existing ones
-
-## 🛠️ The Tech Behind the Magic
-
-Curious about what makes this app tick? Here's the tech stack that powers your weather experience:
-
-### The Core Ingredients 🧪
-- **Kotlin 1.9.20**: The main language - it's like Java but way cooler and more fun to work with
-- **Jetpack Compose**: Google's modern UI toolkit that makes everything look smooth and beautiful
-- **Material 3**: The latest design system from Google for that polished, professional look
-- **Coroutines**: Handles all the behind-the-scenes work without freezing your screen
-
-### Getting Weather Data 🌐
-- **Retrofit & OkHttp**: The dynamic duo that fetches weather data from the internet
-- **OpenWeatherMap API**: Our trusted weather data provider with global coverage
-- **Gson**: Translates weather data from "computer speak" to something the app can understand
-
-### Making Sure Everything Works 🧪
-- **JUnit**: Runs tests to make sure nothing breaks when we add new features
-- **Espresso**: Tests the app like a real user would, tapping buttons and checking results
-
-### The Development Tools 🔧
-- **Android Studio**: Our coding headquarters
-- **Gradle**: The build system that puts everything together
-- **Git**: Keeps track of all our changes and improvements
-
-## 📁 How Everything is Organized
-
-If you're a developer (or just curious!), here's how the code is structured. Think of it like a well-organized filing cabinet where everything has its proper place:
-
-```
-app/src/main/java/com/weatherapp/
-├── data/                             # The data handlers
-│   ├── api/
-│   │   ├── ApiClient.kt              # Internet connection setup
-│   │   └── WeatherApiService.kt      # How we talk to the weather service
-│   ├── model/
-│   │   ├── WeatherData.kt            # Weather info for the app
-│   │   └── WeatherResponse.kt        # Raw weather data from the internet
-│   └── repository/
-│       └── WeatherRepositoryImpl.kt  # The data manager
-├── domain/                           # The business rules
-│   ├── exception/
-│   │   └── WeatherException.kt       # What to do when things go wrong
-│   ├── model/
-│   │   └── Result.kt                 # Success or failure wrapper
-│   └── repository/
-│       └── WeatherRepository.kt      # Data management contract
-├── presentation/                     # What you see and interact with
-│   ├── components/
-│   │   ├── WeatherCard.kt            # The weather display card
-│   │   └── WeatherIcon.kt            # Pretty weather icons
-│   ├── screen/
-│   │   └── WeatherScreen.kt          # The main screen
-│   └── viewmodel/
-│       ├── WeatherUiState.kt         # What the screen should show
-│       └── WeatherViewModel.kt       # The screen's brain
-├── di/                               # Dependency injection (the app's wiring)
-│   └── AppContainer.kt               # How everything connects together
-├── ui/theme/                         # The app's look and feel
-│   ├── Color.kt                      # Color palette
-│   ├── Theme.kt                      # Light/dark themes
-│   └── Type.kt                       # Font styles
-├── MainActivity.kt                   # The app's entry point
-└── WeatherApplication.kt             # App-wide setup
-```
-
-## 🚀 Getting Started
-
-Ready to run this weather app? Don't worry, it's easier than predicting tomorrow's weather! Here's what you need to do:
-
-### What You'll Need First
-- **Android Studio** (the latest version is always best)
-- **Android SDK** (API level 24 or higher - that covers pretty much all modern phones)
-- **Java 11** or newer (your computer's brain needs this to understand the code)
-
-### Let's Get This Running!
-
-1. **Grab the code**: Clone this repository to your computer
+### Setup Steps
+1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/weather-app.git
-   cd weather-app
+   git clone https://github.com/fomoboss-crypto/warp.git
+   cd warp
    ```
 
-2. **Get your weather key**: You'll need a free API key from [OpenWeatherMap](https://openweathermap.org/api)
-   - Sign up (it's free!)
-   - They'll give you a special key that lets the app fetch weather data
-
-3. **Tell the app about your key**: Create a file called `local.properties` in your project folder and add:
+2. **Configure API Key**:
+   Create a `local.properties` file in the project root and add:
    ```properties
    WEATHER_API_KEY=your_actual_api_key_here
    ```
-   (Replace `your_actual_api_key_here` with the key you got from OpenWeatherMap)
 
-4. **Fire it up**: Open the project in Android Studio and hit that green play button, or if you're feeling fancy with the command line:
+3. **Build and Install**:
    ```bash
+   # Install debug build on connected device/emulator
    ./gradlew installDebug
+   
+   # Or build APK file
+   ./gradlew assembleDebug
+   
+   # Run tests
+   ./gradlew test
    ```
 
-That's it! The app should now be running on your device or emulator. 🎉
+4. **Alternative**: Open the project in Android Studio and click the "Run" button.
 
 ### Build Variants
 - **Debug**: Development build with logging enabled
 - **Release**: Production build with ProGuard optimization
+
+## 🏗️ Architecture and Design Decisions
+
+This application follows **Clean Architecture** principles with **MVVM (Model-View-ViewModel)** pattern to ensure maintainability, testability, and separation of concerns.
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────┐
+│           Presentation Layer        │
+│  ┌─────────────┐  ┌─────────────┐   │
+│  │   Compose   │  │  ViewModel  │   │
+│  │     UI      │  │             │   │
+│  └─────────────┘  └─────────────┘   │
+└─────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│            Domain Layer             │
+│  ┌─────────────┐  ┌─────────────┐   │
+│  │ Use Cases   │  │ Repository  │   │
+│  │             │  │ Interface   │   │
+│  └─────────────┘  └─────────────┘   │
+└─────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│             Data Layer              │
+│  ┌─────────────┐  ┌─────────────┐   │
+│  │ Repository  │  │ API Service │   │
+│  │    Impl     │  │             │   │
+│  └─────────────┘  └─────────────┘   │
+└─────────────────────────────────────┘
+```
+
+### Key Architectural Decisions
+
+#### 1. **MVVM with Clean Architecture**
+- **Presentation Layer**: Jetpack Compose UI + ViewModels
+- **Domain Layer**: Use cases and repository interfaces
+- **Data Layer**: Repository implementations and API services
+- **Benefits**: Clear separation of concerns, improved testability, maintainability
+
+#### 2. **Jetpack Compose for UI**
+- **Why**: Modern declarative UI toolkit
+- **Benefits**: Less boilerplate, better performance, easier state management
+- **Implementation**: Single-activity architecture with composable screens
+
+#### 3. **Repository Pattern**
+- **Purpose**: Abstract data sources from business logic
+- **Implementation**: Interface in domain layer, implementation in data layer
+- **Benefits**: Easy to mock for testing, flexible data source switching
+
+#### 4. **Dependency Injection Ready**
+- **Structure**: Constructor injection pattern
+- **Benefits**: Improved testability, loose coupling
+- **Future**: Ready for Hilt/Dagger integration
+
+#### 5. **Error Handling Strategy**
+- **Approach**: Custom exception types with user-friendly messages
+- **Implementation**: Sealed classes for different error states
+- **Benefits**: Consistent error handling across the app
+
+### Project Structure
+
+```
+app/src/main/java/com/weatherapp/
+├── data/                             # Data Layer
+│   ├── api/
+│   │   ├── ApiClient.kt              # HTTP client configuration
+│   │   └── WeatherApiService.kt      # API service definitions
+│   ├── model/
+│   │   ├── WeatherData.kt            # Domain models
+│   │   └── WeatherResponse.kt        # API response models
+│   └── repository/
+│       └── WeatherRepositoryImpl.kt  # Repository implementation
+├── domain/                           # Domain Layer
+│   ├── exception/
+│   │   └── WeatherException.kt       # Custom exceptions
+│   ├── model/
+│   │   └── Weather.kt                # Domain entities
+│   ├── repository/
+│   │   └── WeatherRepository.kt      # Repository interface
+│   └── usecase/
+│       └── GetWeatherUseCase.kt      # Business logic
+├── presentation/                     # Presentation Layer
+│   ├── ui/
+│   │   ├── components/               # Reusable UI components
+│   │   ├── screen/                   # Screen composables
+│   │   └── theme/                    # App theming
+│   └── viewmodel/
+│       ├── WeatherViewModel.kt       # UI state management
+│       └── WeatherUiState.kt         # UI state definitions
+└── MainActivity.kt                   # Single activity entry point
+```
+
+### Technology Stack
+
+#### Core Technologies
+- **Kotlin 1.9.20**: Primary programming language
+- **Jetpack Compose**: Modern UI toolkit
+- **Material 3**: Design system implementation
+- **Coroutines**: Asynchronous programming
+
+#### Networking & Data
+- **Retrofit**: HTTP client for API calls
+- **OkHttp**: HTTP client implementation
+- **Gson**: JSON serialization/deserialization
+- **OpenWeatherMap API**: Weather data provider
+
+#### Testing
+- **JUnit**: Unit testing framework
+- **Espresso**: UI testing framework
+- **Mockito**: Mocking framework (ready for implementation)
+
+#### Build & Development
+- **Gradle Kotlin DSL**: Build configuration
+- **ProGuard**: Code obfuscation and optimization
+- **Git**: Version control
+
+### Design Patterns Used
+
+1. **MVVM**: Separation of UI and business logic
+2. **Repository Pattern**: Data access abstraction
+3. **Observer Pattern**: UI state observation with StateFlow
+4. **Factory Pattern**: Object creation (API client)
+5. **Singleton Pattern**: Single instance management (API client)
+
+### Performance Considerations
+
+- **Lazy Loading**: Components loaded on demand
+- **State Management**: Efficient state updates with Compose
+- **Memory Management**: Proper lifecycle handling
+- **Network Optimization**: Request caching and error retry logic
+- **Build Optimization**: ProGuard for release builds
+
+## ✨ Features
+
+- 🌤️ **Real-time Weather**: Get current temperature, weather conditions, humidity, and wind speed for any city
+- 🔍 **Smart City Search**: Autocomplete city search with real-time suggestions
+- ⚡ **Lightning Fast**: Smooth loading animations and responsive UI
+- 🚨 **Friendly Error Messages**: User-friendly error handling and messaging
+- 🎨 **Beautiful Design**: Clean, modern interface following Material Design 3 principles
+- 🌙 **Dark Mode Ready**: Automatic theme switching based on system preferences
+- 📱 **Responsive Design**: Optimized for phones, tablets, and different screen sizes
 
 ## 🔧 API Configuration
 
@@ -169,10 +199,7 @@ The app talks to OpenWeatherMap to get all that juicy weather data. Here's what 
 3. The free plan gives you 1,000 API calls per day - that's plenty for testing and personal use!
 
 ### Setting It Up
-Add your API key to the `local.properties` file:
-```properties
-WEATHER_API_KEY=your_shiny_new_api_key_here
-```
+Add your API key to the `local.properties` file (as mentioned in the setup steps above):
 
 **Pro tip**: Keep this key secret! The `local.properties` file is already set up to be ignored by Git, so you won't accidentally share it with the world.
 
@@ -355,8 +382,6 @@ Big thanks to the amazing tools and services that make this app possible:
 - **[Retrofit](https://square.github.io/retrofit/)** - For making API calls simple and elegant
 - **[OkHttp](https://square.github.io/okhttp/)** - The networking powerhouse behind the scenes
 - **[Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)** - For keeping everything smooth and responsive
-
-And a special shoutout to the Android development community for all the tutorials, Stack Overflow answers, and open-source libraries that make projects like this possible!
 
 ## 💬 Support
 
