@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Minimal theme for AndroidManifest.xml compatibility - all styling handled by Jetpack Compose -->
+    <style name="Theme.WeatherApp" parent="Theme.AppCompat.DayNight.NoActionBar" />
+</resources>
