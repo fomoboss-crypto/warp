@@ -84,7 +84,7 @@ jobs:
         path: |
           ~/.android/avd/*
           ~/.android/adb*
-        key: avd-30-arm64
+        key: avd-30-x86_64
         
     - name: Create AVD and generate snapshot for caching
       if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -92,7 +92,7 @@ jobs:
       with:
         api-level: 30
         target: google_apis
-        arch: arm64-v8a
+        arch: x86_64
         profile: Nexus 6
         force-avd-creation: false
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -memory 2048 -partition-size 2048 -no-snapshot -wipe-data -accel off
@@ -105,7 +105,7 @@ jobs:
       with:
         api-level: 30
         target: google_apis
-        arch: arm64-v8a
+        arch: x86_64
         profile: Nexus 6
         force-avd-creation: false
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -memory 2048 -partition-size 2048 -wipe-data -accel off
@@ -163,15 +163,15 @@ jobs:
         path: |
           ~/.android/avd/*
           ~/.android/adb*
-        key: avd-30-arm64-screenshot
+        key: avd-30-x86_64-screenshot
         
-    - name: Create AVD for screenshot tests
+    - name: Create AVD and generate snapshot for screenshot testing
       if: steps.avd-cache-screenshot.outputs.cache-hit != 'true'
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 30
         target: google_apis
-        arch: arm64-v8a
+        arch: x86_64
         profile: Nexus 6
         force-avd-creation: false
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -memory 2048 -partition-size 2048 -no-snapshot -wipe-data -accel off
@@ -184,7 +184,7 @@ jobs:
       with:
         api-level: 30
         target: google_apis
-        arch: arm64-v8a
+        arch: x86_64
         profile: Nexus 6
         force-avd-creation: false
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -memory 2048 -partition-size 2048 -wipe-data -accel off
