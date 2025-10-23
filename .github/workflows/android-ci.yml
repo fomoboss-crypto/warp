@@ -44,7 +44,7 @@ jobs:
         reporter: java-junit
         
     - name: Upload unit test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: unit-test-results
@@ -112,7 +112,7 @@ jobs:
         script: ./gradlew connectedAndroidTest
         
     - name: Upload UI test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: ui-test-results
@@ -180,7 +180,7 @@ jobs:
         script: ./gradlew executeScreenshotTests
         
     - name: Upload screenshot test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: screenshot-test-results
@@ -218,7 +218,7 @@ jobs:
       run: ./gradlew assembleDebug
       
     - name: Upload APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: debug-apk
         path: app/build/outputs/apk/debug/app-debug.apk
