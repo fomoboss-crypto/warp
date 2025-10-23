@@ -78,13 +78,13 @@ jobs:
       run: chmod +x gradlew
       
     - name: AVD cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: avd-cache
       with:
         path: |
           ~/.android/avd/*
           ~/.android/adb*
-        key: avd-30
+        key: avd-30-arm64
         
     - name: Create AVD and generate snapshot for caching
       if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -92,7 +92,7 @@ jobs:
       with:
         api-level: 30
         target: google_apis
-        arch: x86_64
+        arch: arm64-v8a
         profile: Nexus 6
         force-avd-creation: false
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 2048 -partition-size 2048
@@ -105,7 +105,7 @@ jobs:
       with:
         api-level: 30
         target: google_apis
-        arch: x86_64
+        arch: arm64-v8a
         profile: Nexus 6
         force-avd-creation: false
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 2048 -partition-size 2048
@@ -147,14 +147,14 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       
-    - name: AVD cache
-      uses: actions/cache@v3
+    - name: AVD cache for screenshot tests
+      uses: actions/cache@v4
       id: avd-cache-screenshot
       with:
         path: |
           ~/.android/avd/*
           ~/.android/adb*
-        key: avd-screenshot-30
+        key: avd-30-arm64-screenshot
         
     - name: Create AVD for screenshot tests
       if: steps.avd-cache-screenshot.outputs.cache-hit != 'true'
@@ -162,7 +162,7 @@ jobs:
       with:
         api-level: 30
         target: google_apis
-        arch: x86_64
+        arch: arm64-v8a
         profile: Nexus 6
         force-avd-creation: false
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 2048 -partition-size 2048
@@ -175,7 +175,7 @@ jobs:
       with:
         api-level: 30
         target: google_apis
-        arch: x86_64
+        arch: arm64-v8a
         profile: Nexus 6
         force-avd-creation: false
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 2048 -partition-size 2048
