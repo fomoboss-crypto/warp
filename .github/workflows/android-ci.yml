@@ -40,7 +40,7 @@ jobs:
       if: success() || failure()
       with:
         name: Unit Test Results
-        path: '**/build/test-results/test/TEST-*.xml'
+        path: '**/build/test-results/testDebugUnitTest/TEST-*.xml'
         reporter: java-junit
         
     - name: Upload unit test results
