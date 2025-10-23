@@ -10,6 +10,7 @@ data class WeatherUiState(
     val weatherData: WeatherData? = null,
     val errorMessage: String? = null,
     val cityInput: String = "",
+    val selectedFullCityName: String? = null, // Stores the full city name from autocomplete selection
     val citySuggestions: List<String> = emptyList(),
     val isLoadingSuggestions: Boolean = false,
     val hasSearchedCities: Boolean = false

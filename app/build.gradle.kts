@@ -107,6 +107,9 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation("io.mockk:mockk-android:1.13.8")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    
+    // Screenshot testing (using built-in Compose testing)
+    androidTestImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Debug dependencies
     debugImplementation("androidx.compose.ui:ui-tooling")

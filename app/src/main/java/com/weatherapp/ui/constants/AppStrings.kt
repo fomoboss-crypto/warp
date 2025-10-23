@@ -11,6 +11,7 @@ object AppStrings {
     const val ERROR_INVALID_CITY = "City not found. Please check the city name and try again."
     const val ERROR_NETWORK = "Network error. Please check your internet connection."
     const val ERROR_GENERAL = "Something went wrong. Please try again."
+    const val NO_CITIES_FOUND = "No cities found"
     
     fun temperatureCelsius(temp: Int): String = "${temp}°C"
     fun feelsLike(temp: Int): String = "Feels like ${temp}°C"

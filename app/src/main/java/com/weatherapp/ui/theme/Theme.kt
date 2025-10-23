@@ -16,36 +16,56 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = SkyBlue,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
-    background = DarkGray,
-    surface = DarkBlue,
-    onPrimary = DarkGray,
-    onSecondary = DarkGray,
-    onTertiary = DarkGray,
-    onBackground = LightGray,
-    onSurface = LightGray,
+    primary = PrimaryBlue,
+    onPrimary = TextOnDark,
+    primaryContainer = PrimaryBlueDark,
+    onPrimaryContainer = TextOnDark,
+    secondary = SecondaryBlue,
+    onSecondary = TextOnDark,
+    secondaryContainer = TertiaryBlue,
+    onSecondaryContainer = TextPrimary,
+    tertiary = GradientStart,
+    onTertiary = TextOnDark,
+    background = SurfaceDark,
+    onBackground = TextOnDark,
+    surface = SurfaceDark,
+    onSurface = TextOnDark,
+    surfaceVariant = SurfaceVariantDark,
+    onSurfaceVariant = TextOnDark,
+    error = ErrorRed,
+    onError = TextOnDark,
+    outline = TextSecondary,
+    outlineVariant = DarkGray
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = DarkBlue,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-    background = LightGray,
-    surface = SkyBlue,
-    onPrimary = LightGray,
-    onSecondary = LightGray,
-    onTertiary = LightGray,
-    onBackground = DarkGray,
-    onSurface = DarkGray,
+    primary = PrimaryBlue,
+    onPrimary = TextOnDark,
+    primaryContainer = TertiaryBlue,
+    onPrimaryContainer = TextPrimary,
+    secondary = SecondaryBlue,
+    onSecondary = TextOnDark,
+    secondaryContainer = SurfaceVariantLight,
+    onSecondaryContainer = TextPrimary,
+    tertiary = GradientStart,
+    onTertiary = TextOnDark,
+    background = SurfaceLight,
+    onBackground = TextPrimary,
+    surface = SurfaceLight,
+    onSurface = TextPrimary,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = TextPrimary,
+    error = ErrorRed,
+    onError = TextOnDark,
+    outline = TextSecondary,
+    outlineVariant = CloudyGray
 )
 
 @Composable
 fun WeatherAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false, // Disabled to maintain custom branding
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -62,7 +82,7 @@ fun WeatherAppTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 

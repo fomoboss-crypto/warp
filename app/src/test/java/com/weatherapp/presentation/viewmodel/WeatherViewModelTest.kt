@@ -34,6 +34,7 @@ class WeatherViewModelTest {
 
     private val sampleWeatherData = WeatherData(
         cityName = "London",
+        fullCityName = "London, GB",
         temperature = 20,
         feelsLike = 22,
         condition = "Clear",
@@ -288,5 +289,79 @@ class WeatherViewModelTest {
         
         coVerify(exactly = 0) { weatherRepository.getCurrentWeather(any()) }
         assertTrue(viewModel.uiState.value.isIdle)
+    }
+
+    @Test
+    fun `selectCitySuggestion should update state and automatically trigger weather search`() = runTest {
+        val cityName = "London"
+        
+        coEvery { weatherRepository.getCurrentWeather(cityName, cityName) } returns flowOf(
+            Result.Loading,
+            Result.Success(sampleWeatherData)
+        )
+        
+        viewModel.selectCitySuggestion(cityName)
+        advanceUntilIdle()
+        
+        val finalState = viewModel.uiState.value
+        assertEquals(cityName, finalState.cityInput)
+        assertEquals(cityName, finalState.selectedFullCityName)
+        assertTrue(finalState.citySuggestions.isEmpty())
+        assertNull(finalState.errorMessage)
+        assertFalse(finalState.hasSearchedCities)
+        assertFalse(finalState.isLoadingSuggestions)
+        
+        // Verify weather data was fetched automatically
+        assertFalse(finalState.isLoading)
+        assertEquals(sampleWeatherData, finalState.weatherData)
+        assertTrue(finalState.hasWeatherData)
+        
+        coVerify { weatherRepository.getCurrentWeather(cityName, cityName) }
+    }
+
+    @Test
+    fun `selectCitySuggestion should handle weather fetch error correctly`() = runTest {
+        val cityName = "InvalidCity"
+        
+        coEvery { weatherRepository.getCurrentWeather(cityName, cityName) } returns flowOf(
+            Result.Error(WeatherException.CityNotFoundException(cityName))
+        )
+        
+        viewModel.selectCitySuggestion(cityName)
+        advanceUntilIdle()
+        
+        val finalState = viewModel.uiState.value
+        assertEquals(cityName, finalState.cityInput)
+        assertEquals(cityName, finalState.selectedFullCityName)
+        assertTrue(finalState.citySuggestions.isEmpty())
+        assertFalse(finalState.hasSearchedCities)
+        assertFalse(finalState.isLoadingSuggestions)
+        
+        // Verify error handling
+        assertFalse(finalState.isLoading)
+        assertNull(finalState.weatherData)
+        assertEquals("City not found. Please check the city name and try again.", finalState.errorMessage)
+        assertTrue(finalState.hasError)
+        
+        coVerify { weatherRepository.getCurrentWeather(cityName, cityName) }
+    }
+
+    @Test
+    fun `selectCitySuggestion should preserve full city name for display`() = runTest {
+        val fullCityName = "London, United Kingdom"
+        
+        coEvery { weatherRepository.getCurrentWeather(fullCityName, fullCityName) } returns flowOf(
+            Result.Success(sampleWeatherData.copy(fullCityName = fullCityName))
+        )
+        
+        viewModel.selectCitySuggestion(fullCityName)
+        advanceUntilIdle()
+        
+        val finalState = viewModel.uiState.value
+        assertEquals(fullCityName, finalState.cityInput)
+        assertEquals(fullCityName, finalState.selectedFullCityName)
+        
+        // Verify the full city name is passed to the repository
+        coVerify { weatherRepository.getCurrentWeather(fullCityName, fullCityName) }
     }
 }

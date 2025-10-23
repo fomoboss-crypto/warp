@@ -5,6 +5,7 @@ package com.weatherapp.data.model
  */
 data class WeatherData(
     val cityName: String,
+    val fullCityName: String, // City name with country (e.g., "London, GB")
     val temperature: Int, // in Celsius
     val feelsLike: Int, // in Celsius
     val condition: String, // e.g., "Sunny", "Cloudy", "Rainy"
@@ -17,9 +18,10 @@ data class WeatherData(
 /**
  * Extension function to convert WeatherResponse to WeatherData
  */
-fun WeatherResponse.toWeatherData(): WeatherData {
+fun WeatherResponse.toWeatherData(fullCityNameOverride: String? = null): WeatherData {
     return WeatherData(
         cityName = name,
+        fullCityName = fullCityNameOverride ?: "$name, ${sys.country}",
         temperature = main.temperature.toInt(), // Already in Celsius from API
         feelsLike = main.feelsLike.toInt(), // Already in Celsius from API
         condition = weather.firstOrNull()?.main ?: "Unknown",

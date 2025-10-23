@@ -109,3 +109,6 @@ Desktop.ini
 
 # Kotlin
 *.kt.bak
+
+# Personal technical documentation (private use only)
+TECHNICAL_DOCUMENTATION.md

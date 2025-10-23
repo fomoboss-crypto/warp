@@ -12,9 +12,10 @@ interface WeatherRepository {
     /**
      * Get current weather data for a given city name
      * @param cityName The name of the city
+     * @param fullCityNameOverride Optional full city name to display instead of API response name
      * @return Flow of Result containing WeatherData or error
      */
-    suspend fun getCurrentWeather(cityName: String): Flow<Result<WeatherData>>
+    suspend fun getCurrentWeather(cityName: String, fullCityNameOverride: String? = null): Flow<Result<WeatherData>>
     
     /**
      * Get current weather data for given coordinates

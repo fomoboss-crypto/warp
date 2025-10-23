@@ -23,7 +23,7 @@ class WeatherRepositoryImpl(
     
     private val apiKey = BuildConfig.WEATHER_API_KEY
     
-    override suspend fun getCurrentWeather(cityName: String): Flow<Result<WeatherData>> = flow {
+    override suspend fun getCurrentWeather(cityName: String, fullCityNameOverride: String?): Flow<Result<WeatherData>> = flow {
         emit(Result.Loading)
         
         try {
@@ -32,7 +32,7 @@ class WeatherRepositoryImpl(
                 apiKey = apiKey
             )
             
-            val result = processWeatherResponse(response, cityName)
+            val result = processWeatherResponse(response, cityName, fullCityNameOverride)
             emit(result)
         } catch (exception: Exception) {
             val weatherException = mapException(exception)
@@ -67,11 +67,12 @@ class WeatherRepositoryImpl(
      */
     private fun processWeatherResponse(
         response: retrofit2.Response<com.weatherapp.data.model.WeatherResponse>,
-        locationIdentifier: String
+        locationIdentifier: String,
+        fullCityNameOverride: String? = null
     ): Result<WeatherData> {
         return if (response.isSuccessful) {
             response.body()?.let { weatherResponse ->
-                val weatherData = weatherResponse.toWeatherData()
+                val weatherData = weatherResponse.toWeatherData(fullCityNameOverride)
                 Result.Success(weatherData)
             } ?: Result.Error(WeatherException.ApiException("Empty response body"))
         } else {

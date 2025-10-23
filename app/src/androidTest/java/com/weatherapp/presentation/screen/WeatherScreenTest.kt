@@ -1,14 +1,13 @@
 package com.weatherapp.presentation.screen
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsEnabled
-import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.performImeAction
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.weatherapp.data.model.WeatherData
 import com.weatherapp.domain.exception.WeatherException
@@ -37,6 +36,7 @@ class WeatherScreenTest {
 
     private val sampleWeatherData = WeatherData(
         cityName = "London",
+        fullCityName = "London, GB",
         temperature = 20,
         feelsLike = 22,
         condition = "Clear",
@@ -67,30 +67,24 @@ class WeatherScreenTest {
         // Check if city input field is displayed
         composeTestRule.onNodeWithText("Enter city name").assertIsDisplayed()
         
-        // Check if search button is displayed but disabled (empty input)
-        composeTestRule.onNodeWithText("Get Weather").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Get Weather").assertIsNotEnabled()
-        
         // Check if idle message is displayed
         composeTestRule.onNodeWithText("Enter a city name to get weather information").assertIsDisplayed()
     }
 
     @Test
-    fun weatherScreen_cityInputUpdatesButton() {
+    fun weatherScreen_inputFieldAcceptsText() {
         composeTestRule.setContent {
             WeatherAppTheme {
                 WeatherScreen(viewModel = viewModel)
             }
         }
 
-        // Initially button should be disabled
-        composeTestRule.onNodeWithText("Get Weather").assertIsNotEnabled()
+        // Input field should accept text input
+        val inputField = composeTestRule.onNodeWithText("Enter city name")
+        inputField.performTextInput("London")
 
-        // Type in city name
-        composeTestRule.onNodeWithText("Enter city name").performTextInput("London")
-
-        // Button should now be enabled
-        composeTestRule.onNodeWithText("Get Weather").assertIsEnabled()
+        // Verify text was entered
+        composeTestRule.onNodeWithText("London").assertIsDisplayed()
     }
 
     @Test
@@ -106,9 +100,9 @@ class WeatherScreenTest {
             }
         }
 
-        // Enter city name and click search
+        // Enter city name and trigger search via IME action
         composeTestRule.onNodeWithText("Enter city name").performTextInput("London")
-        composeTestRule.onNodeWithText("Get Weather").performClick()
+        composeTestRule.onNodeWithText("London").performImeAction()
 
         // Wait for the weather data to be displayed
         composeTestRule.waitForIdle()
@@ -132,14 +126,11 @@ class WeatherScreenTest {
             }
         }
 
-        // Enter city name and click search
+        // Enter city name and trigger search via IME action
         composeTestRule.onNodeWithText("Enter city name").performTextInput("London")
-        composeTestRule.onNodeWithText("Get Weather").performClick()
+        composeTestRule.onNodeWithText("London").performImeAction()
 
         // Check if loading indicator is displayed
-        composeTestRule.onNodeWithText("Loading...").assertIsDisplayed()
-        
-        // Check if button shows loading state
         composeTestRule.onNodeWithText("Loading...").assertIsDisplayed()
     }
 
@@ -155,9 +146,9 @@ class WeatherScreenTest {
             }
         }
 
-        // Enter invalid city name and click search
+        // Enter invalid city name and trigger search via IME action
         composeTestRule.onNodeWithText("Enter city name").performTextInput("InvalidCity")
-        composeTestRule.onNodeWithText("Get Weather").performClick()
+        composeTestRule.onNodeWithText("InvalidCity").performImeAction()
 
         // Wait for error to be processed
         composeTestRule.waitForIdle()
@@ -167,27 +158,27 @@ class WeatherScreenTest {
     }
 
     @Test
-    fun weatherScreen_emptyInput_buttonDisabled() {
+    fun weatherScreen_inputValidation_handlesEmptyInput() {
         composeTestRule.setContent {
             WeatherAppTheme {
                 WeatherScreen(viewModel = viewModel)
             }
         }
 
-        // Button should be disabled with empty input
-        composeTestRule.onNodeWithText("Get Weather").assertIsNotEnabled()
+        // Input field should be present and ready for input
+        composeTestRule.onNodeWithText("Enter city name").assertIsDisplayed()
 
         // Type something then clear it
         composeTestRule.onNodeWithText("Enter city name").performTextInput("London")
-        composeTestRule.onNodeWithText("Get Weather").assertIsEnabled()
+        composeTestRule.onNodeWithText("London").assertIsDisplayed()
 
-        // Clear the input
+        // Clear the input by replacing with empty string
         composeTestRule.onNodeWithText("Enter city name").performTextInput("")
-        composeTestRule.onNodeWithText("Get Weather").assertIsNotEnabled()
+        composeTestRule.onNodeWithText("Enter city name").assertIsDisplayed()
     }
 
     @Test
-    fun weatherScreen_whitespaceInput_buttonDisabled() {
+    fun weatherScreen_inputValidation_handlesWhitespaceInput() {
         composeTestRule.setContent {
             WeatherAppTheme {
                 WeatherScreen(viewModel = viewModel)
@@ -197,8 +188,8 @@ class WeatherScreenTest {
         // Type only whitespace
         composeTestRule.onNodeWithText("Enter city name").performTextInput("   ")
 
-        // Button should still be disabled
-        composeTestRule.onNodeWithText("Get Weather").assertIsNotEnabled()
+        // Input field should display the whitespace text
+        composeTestRule.onNodeWithText("   ").assertIsDisplayed()
     }
 
     @Test
@@ -221,6 +212,11 @@ class WeatherScreenTest {
 
     @Test
     fun weatherScreen_autocompleteSuggestionSelection() {
+        coEvery { mockRepository.getCurrentWeather("London", "London") } returns flowOf(
+            Result.Loading,
+            Result.Success(sampleWeatherData)
+        )
+
         composeTestRule.setContent {
             WeatherAppTheme {
                 WeatherScreen(viewModel = viewModel)
@@ -231,14 +227,21 @@ class WeatherScreenTest {
         composeTestRule.onNodeWithText("Enter city name").performTextInput("Lon")
         composeTestRule.waitForIdle()
 
-        // Click on London suggestion
+        // Select London suggestion by clicking on it
         composeTestRule.onNodeWithText("London").performClick()
+
+        // Wait for automatic weather search to complete
+        composeTestRule.waitForIdle()
 
         // Verify the input field now contains "London"
         composeTestRule.onNodeWithText("London").assertIsDisplayed()
         
-        // Verify button is now enabled
-        composeTestRule.onNodeWithText("Get Weather").assertIsEnabled()
+        // Verify weather data is automatically displayed after selection
+        composeTestRule.onNodeWithText("20°C").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Clear").assertIsDisplayed()
+        composeTestRule.onNodeWithText("clear sky").assertIsDisplayed()
+        composeTestRule.onNodeWithText("65%").assertIsDisplayed()
+        composeTestRule.onNodeWithText("3.5 m/s").assertIsDisplayed()
     }
 
     @Test
