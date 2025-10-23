@@ -77,6 +77,21 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       
+    - name: Detect runner architecture
+      id: runner-arch
+      run: |
+        ARCH=$(uname -m)
+        echo "Host architecture: $ARCH"
+        if [ "$ARCH" = "arm64" ]; then
+          echo "emulator_arch=arm64-v8a" >> $GITHUB_OUTPUT
+          echo "cache_key=avd-30-arm64" >> $GITHUB_OUTPUT
+          echo "emulator_options=-no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -memory 2048 -partition-size 2048 -no-snapshot -wipe-data" >> $GITHUB_OUTPUT
+        else
+          echo "emulator_arch=x86_64" >> $GITHUB_OUTPUT
+          echo "cache_key=avd-30-x86_64" >> $GITHUB_OUTPUT
+          echo "emulator_options=-no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -memory 2048 -partition-size 2048 -no-snapshot -wipe-data -accel off" >> $GITHUB_OUTPUT
+        fi
+        
     - name: AVD cache
       uses: actions/cache@v4
       id: avd-cache
@@ -84,7 +99,7 @@ jobs:
         path: |
           ~/.android/avd/*
           ~/.android/adb*
-        key: avd-30-x86_64
+        key: ${{ steps.runner-arch.outputs.cache_key }}
         
     - name: Create AVD and generate snapshot for caching
       if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -92,10 +107,10 @@ jobs:
       with:
         api-level: 30
         target: google_apis
-        arch: x86_64
+        arch: ${{ steps.runner-arch.outputs.emulator_arch }}
         profile: Nexus 6
         force-avd-creation: false
-        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -memory 2048 -partition-size 2048 -no-snapshot -wipe-data -accel off
+        emulator-options: ${{ steps.runner-arch.outputs.emulator_options }}
         disable-animations: false
         emulator-boot-timeout: 900
         script: echo "Generated AVD snapshot for caching."
@@ -105,10 +120,10 @@ jobs:
       with:
         api-level: 30
         target: google_apis
-        arch: x86_64
+        arch: ${{ steps.runner-arch.outputs.emulator_arch }}
         profile: Nexus 6
         force-avd-creation: false
-        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -memory 2048 -partition-size 2048 -wipe-data -accel off
+        emulator-options: ${{ steps.runner-arch.outputs.emulator_options }}
         disable-animations: true
         emulator-boot-timeout: 900
         script: |
@@ -156,6 +171,21 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       
+    - name: Detect runner architecture for screenshot tests
+      id: runner-arch-screenshot
+      run: |
+        ARCH=$(uname -m)
+        echo "Host architecture: $ARCH"
+        if [ "$ARCH" = "arm64" ]; then
+          echo "emulator_arch=arm64-v8a" >> $GITHUB_OUTPUT
+          echo "cache_key=avd-30-arm64-screenshot" >> $GITHUB_OUTPUT
+          echo "emulator_options=-no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -memory 2048 -partition-size 2048 -no-snapshot -wipe-data" >> $GITHUB_OUTPUT
+        else
+          echo "emulator_arch=x86_64" >> $GITHUB_OUTPUT
+          echo "cache_key=avd-30-x86_64-screenshot" >> $GITHUB_OUTPUT
+          echo "emulator_options=-no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -memory 2048 -partition-size 2048 -no-snapshot -wipe-data -accel off" >> $GITHUB_OUTPUT
+        fi
+      
     - name: AVD cache for screenshot tests
       uses: actions/cache@v4
       id: avd-cache-screenshot
@@ -163,7 +193,7 @@ jobs:
         path: |
           ~/.android/avd/*
           ~/.android/adb*
-        key: avd-30-x86_64-screenshot
+        key: ${{ steps.runner-arch-screenshot.outputs.cache_key }}
         
     - name: Create AVD and generate snapshot for screenshot testing
       if: steps.avd-cache-screenshot.outputs.cache-hit != 'true'
@@ -171,10 +201,10 @@ jobs:
       with:
         api-level: 30
         target: google_apis
-        arch: x86_64
+        arch: ${{ steps.runner-arch-screenshot.outputs.emulator_arch }}
         profile: Nexus 6
         force-avd-creation: false
-        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -memory 2048 -partition-size 2048 -no-snapshot -wipe-data -accel off
+        emulator-options: ${{ steps.runner-arch-screenshot.outputs.emulator_options }}
         disable-animations: false
         emulator-boot-timeout: 900
         script: echo "Generated AVD snapshot for screenshot testing."
@@ -184,10 +214,10 @@ jobs:
       with:
         api-level: 30
         target: google_apis
-        arch: x86_64
+        arch: ${{ steps.runner-arch-screenshot.outputs.emulator_arch }}
         profile: Nexus 6
         force-avd-creation: false
-        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -memory 2048 -partition-size 2048 -wipe-data -accel off
+        emulator-options: ${{ steps.runner-arch-screenshot.outputs.emulator_options }}
         disable-animations: true
         emulator-boot-timeout: 900
         script: |
